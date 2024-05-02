@@ -20,6 +20,40 @@
 #include "stb_image_write.h"
 #include <vector>
 
+
+
+
+void imageToHex(const char*, const char*);
+void hexToImage(const char*, const char*, int, int, int);
+
+void print_help(void){
+
+    printf("This code converts an image to the hexadecimal datafile,or vice versa. Pass the following Arguments:\n\n");
+    printf("To convert from image file to hexadecimal file: 0 <image_filename> <output_filename>\n");
+    printf("To convert from hexadecimal to imagefilename: -1 <hexadecimal_filename> <output_filename> <width> <height>\n");
+
+}
+int main(int argc, char** argv) {
+   
+    if(argc < 4){
+        print_help();
+        return -1;
+    }else if(strcmp(argv[1],"0")==0){
+        imageToHex(argv[2], argv[3]);
+    }else if(strcmp(argv[1],"-1") == 0){
+        if(argc<6){
+            print_help();
+            return -1;
+        }
+        hexToImage(argv[2],argv[3],atoi(argv[4]),atoi(argv[5]),3);
+    }else{
+        printf("Invalid Command line options!.\n");
+        print_help();
+    }
+    
+    return 0;
+}
+
 /***************************************************************************************
  * @brief: Converts image file to hexadecimal data file for easy reading by verilog
  * 
@@ -36,20 +70,24 @@ void imageToHex(const char* inputFile, const char* outputFile) {
     unsigned char *img = stbi_load(inputFile, &width, &height, &channels, 0);
     if (img == nullptr) {
         std::cerr << "Error in loading the image" << std::endl;
-        return;
+        exit(0);
     }
+    std::cout<<"Image Height: "<<height<<"\nImage Width: "<<width<<"\n Channels: "<<channels<<std::endl;
     if(width*height > 512*512) {
         std::cerr << "Image too big!."<<std::endl;
-        return ;
+        exit(0);
+
     }
     std::ofstream out(outputFile);
     if (!out) {
         std::cerr << "Error in creating the output file" << std::endl;
         stbi_image_free(img);
-        return;
+          exit(0);
+
     }
 
     // Output each byte of the image data in hexadecimal format
+    std::cout<<"Writing pixels..."<<std::endl;
     for (int i = 0; i < width * height * channels; ++i) {
         out << std::hex << std::setw(2) << std::setfill('0') << (int)img[i];
         if ((i + 1) % channels == 0) out << "\n"; // New line for each pixel (for readability)
@@ -60,6 +98,7 @@ void imageToHex(const char* inputFile, const char* outputFile) {
     out.close();
     std::cout << "Hex data written successfully to " << outputFile << std::endl;
 }
+
 
 /**************************************************************************************
  * @brief:  Convert hexadecimal datafile of image pixels into an image output file    *
@@ -77,11 +116,13 @@ void hexToImage(const char* hexFile, const char* outputFile, int width = 512, in
     std::ifstream in(hexFile);
     if (!in) {
         std::cerr << "Error in opening the hex file" << std::endl;
-        return;
+            exit(0);
+
     }
     if(width*height> 512*512) {
-        std::cerr << "Requested Image too big"<<std::endl;
-        return;
+        std::cerr << "Requested Image too big!"<<std::endl;
+             exit(0);
+
     }
     std::vector<unsigned char> imageData;
     std::string hexValue;
@@ -99,14 +140,4 @@ void hexToImage(const char* hexFile, const char* outputFile, int width = 512, in
     } else {
         std::cout << "Image successfully written to " << outputFile << std::endl;
     }
-}
-
-int main(int argc, char** argv) {
-    if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <input_image> <output_hex_file>" << std::endl;
-        return 1;
-    }
-
-    imageToHex(argv[1], argv[2]);
-    return 0;
 }
