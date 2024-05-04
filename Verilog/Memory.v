@@ -3,58 +3,74 @@
 //	The memory is implemented in BIG EDIAN									 //									 	
 // 																			 //	
 // 																			 //
-//																			 //
+//@Auhtor: Kananelo Chabeli													 //
 //---------------------------------------------------------------------------//
 
 
-module Memory(
+module Memory(Mem_Clk, Mem_Reset, Mem_Read_Enable, Mem_Write_Enable, Mem_Input_Data,Mem_Write_Address, Mem_Read_Address, Mem_Output_Data);
 
-input Mem_Clk, // memory is driven by a clock signal. Reads and Write occur at rising edge.
+//-----------------------------------------MODULE PARAMETERS-------------------------------------------//
+	
+	parameter CHANNELS = 3; // Number of channel in a pixel(defialts to RBG color)
+	parameter DATA_WIDTH = 24; //data width (read and write width)
+	parameter BUS_WIDTH = 32; //Address bus is 32-bit wide by default
+	parameter MEMORY_DEPTH = 4194304; //Memory Depth in bytes ( Number of bytes): Defaults to 4MB
+	parameter MEMORY_DATA_WIDTH = 8; //memory data width 8 bits by default.
+
+//-----------------------------------------MODULE PORT DECLARATIONS------------------------------------//
+
+input Mem_Clk; // memory is driven by a clock signal. Reads and Write occur at rising edge.
 
 input Mem_Reset; //Resets the memory block
 
-input Mem_Read_Enable, // if Set HIGH, then data read from memory
+input Mem_Read_Enable; // if Set HIGH, then data read from memory
 
-input Mem_Write_Enable, //if Set HIGH, data on written to memory
+input Mem_Write_Enable; //if Set HIGH, data on written to memory
 
-input wire [23:0] Mem_Input_Data, //24-bit data to write to Memory
+input wire [DATA_WIDTH- 1:0] Mem_Input_Data; //24-bit data to write to Memory
 
-input wire [31:0] Mem_Write_Address, //Address where the data should be written
+input wire [BUS_WIDTH - 1:0] Mem_Write_Address; //Address where the data should be written
 
-input wire [31:0] Mem_Read_Address, // Address where data is read
+input wire [BUS_WIDTH - 1:0] Mem_Read_Address; // Address where data is read
 
-output reg [23:0] Mem_Output_Data,//Memory read Data+
-);
+output reg [DATA_WIDTH -1:0] Mem_Output_Data;//Memory read Data
 
-	reg [7:0] memory [0:4194303]; //4MB memory
+//-----------------------------------------INTERNAL MODULE REGISTERS AND VARIABLES--------------------//
 
-	integer index;
-//------------------------Memory Implementation--------------------------//
+reg [MEMORY_DATA_WIDTH-1:0] memory [0:MEMORY_DEPTH-1]; //4MB memory by defualt
+
+integer index;
+integer i;
+
+//------------------------MODULE IMPLEMENTATION BLOCK-------------------------------------------------//
 
 always@(posedge Mem_Clk) begin
 
+//----------------------IMPLEMENTING RESET OPERATION--------------------------------------------------//
 	if (Mem_Reset) begin
-		Mem_Output_Data <= 24'h000000;
-		for(index = 0; index < 4194303; index ++) begin
-			memory[index] <= 8'h00;
+		Mem_Output_Data <= 0;
+		for(index = 0; index < MEMORY_DEPTH-1; index ++) begin
+			memory[index] <= 0;
 		end 
 
+//--------------------IMPLEMENTAING WRITE OPERATION---------------------------------------------------//
+	
 	end else if(Mem_Write_Enable) begin
-	//Store upper byte of write data (Red Channel)
-		memory[Mem_Write_Address] <= Mem_Input_Data[23:16]; 
+	
+	//copy each byte of write data into the buffer
+	for(i=0; i<CHANNELS; i++) begin
+		memory[Mem_Write_Address+i] <= Mem_Input_Data[DATA_WIDTH-1-(i*8)-:MEMORY_DATA_WIDTH];
+	end
 
-	//Store middle byte of write data (Green channel)
-		memory[Mem_Write_Address+1] <= Mem_Input_Data[15:8];
+//------------------IMPLEMENTING READ_OPERATION------------------------------------------------------//
 
-	//Write the last byte of the data (Blue channel) 
-		memory[Mem_Write_Address+2] <= Mem_Input_Data[7:0]; 
 	end else if(Mem_Read_Enable) begin
-		Mem_Output_Data[23:16] <= memory[Mem_Read_Address];
-		Mem_Output_Data[15:8] <= memory[Mem_Read_Address+1];
-		Mem_Output_Data[7:0] <= memoru[Mem_Read_Address+2];
+	for(i =0; i<CHANNELS; i++) begin
+		Mem_Output_Data[DATA_WIDTH-1-(i*8)-:MEMORY_DATA_WIDTH] <= memory[Mem_Read_Address+i];
+	end
 	end
 
 end
 
-
+//----------------------------------END OF MODULE IMPLEMENTATION-----------------------------------//
 endmodule
