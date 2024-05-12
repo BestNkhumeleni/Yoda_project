@@ -60,13 +60,13 @@ end
 always@(posedge Wind_En) begin
 	row = Wind_Rstrt;
 	col = Wind_Cstrt;
-	Wind_MemAddr = row*WINDOW_SIZE+col; //Build the address where the start pixel is located
+	Wind_MemAddr = row*IMG_WIDTH+col; //Build the address where the start pixel is located
 	Wind_Ren = 2'b10; // Enable Read
 end
 
 //Wind_DRDY is ready flag sent by the Memory module (it will occur at the rising edge of the clock)
 always@(negedge Wind_DRDY) begin
-	Wind_Ren = 2'b00; //reset window ready to 0
+	
 	if(i>=WINDOW_SIZE*WINDOW_SIZE) begin
 		i = 0;
 		Wind_RDY=1'b1;
@@ -74,7 +74,7 @@ always@(negedge Wind_DRDY) begin
 		if(Wind_En) begin
 			Wind_Data[tot_window_size-1-(DATA_WIDTH*i)-:DATA_WIDTH] = Wind_MemData;
 		//increment iterators
-			if(i%(WINDOW_SIZE-1)==0 && i!=0) begin
+			if((i+1)%(WINDOW_SIZE)==0 && i!=0) begin
 				row = row + 1;
 				col = Wind_Cstrt;
 				i = i+1;
@@ -90,6 +90,6 @@ end
 
 
 always@(negedge Wind_En) begin
-	Wind_RDY <= 0;
+	#2 Wind_RDY <= 0;
 end
 endmodule
