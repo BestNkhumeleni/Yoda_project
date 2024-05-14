@@ -8,8 +8,6 @@
  * *************************************************************************
  * */
 
-
-
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -21,9 +19,7 @@
 #include <vector>
 #include <string>
 
-
-
-void imageToHex(const char*, const char*, int);
+void imageToHex(char*,char*, int);
 void hexToImage(const char*, const char*, int, int, int);
 void hexFileToPng(const char* hexFile, const char* pngFilename, int width, int height);
 void print_help(void){
@@ -72,7 +68,6 @@ void hexFileToPng(const char* hexFile, const char* pngFilename, int width, int h
         std::cerr << "Failed to open hex file: " << hexFile << std::endl;
         return;
     }
-
     std::vector<unsigned char> imageData;
     std::string hexPixel;
     while (std::getline(in, hexPixel)) {
@@ -90,7 +85,6 @@ void hexFileToPng(const char* hexFile, const char* pngFilename, int width, int h
             return;
         }
     }
-
     if (imageData.size() != width * height * 3) {  // Assuming 3 channels (RGB)
         std::cerr << "Hex data does not match the specified dimensions and channel count." << std::endl;
         return;
@@ -114,7 +108,7 @@ void hexFileToPng(const char* hexFile, const char* pngFilename, int width, int h
  * @retVal: None
  * *************************************************************************************
  * */
-void imageToHex(const char* inputFile, const char* outputFile,int window_size) {
+void imageToHex(char* inputFile, char* outputFile,int window_size) {
     int width, height, channels;
      if(window_size%2 == 0 or window_size<3){
         std::cout << "Invalid window size."<<std::endl;
@@ -146,8 +140,9 @@ void imageToHex(const char* inputFile, const char* outputFile,int window_size) {
     std::ofstream out(outputFile);
 
     std::string outputFilename(outputFile);
-    std::string paddedFilename("./zeroPadded-");
-    std::ofstream paddedout(paddedFilename+outputFilename.substr(2,outputFilename.length()));
+    std::string paddedFilename;
+    paddedFilename = outputFilename.substr(0,outputFilename.length()-4)+std::string("-zeroPadded.txt");
+    std::ofstream paddedout(paddedFilename);
 
     //writing padded and unpadded image to the output file.
     for(int row =0; row < paddedHeight; row++){
