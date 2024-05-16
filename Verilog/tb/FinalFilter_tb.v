@@ -4,14 +4,13 @@ module testBench();
 
 	parameter  IMG_W = 512;
 	parameter  IMG_H = 366;
-	parameter WIND = 3;
+	parameter WIND = 5;
 	parameter D_W = 24;
 	parameter B_W = 32;
 	parameter DEPTH = (IMG_W+WIND-1)*(IMG_H+WIND-1);
-	parameter INPUT_FILENAME = "../../C++/hexazeroPadded.txt";
-	parameter OUTPUT_FILENAME = "../../C++/hexaFiltout.txt";
+	parameter INPUT_FILENAME = "./Hexadecimal-Images/dogs3zeroPadded.txt";
+	parameter OUTPUT_FILENAME = "./Hexadecimal-Images/dogs3Filtout.txt";
 	//Signal line
-
 	reg clk,strt, rst;
 	wire filt_dne, system_dne, filt_en, mem_rdy;
 	wire [1:0] mem_rw;
