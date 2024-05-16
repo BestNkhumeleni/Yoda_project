@@ -1,5 +1,6 @@
+# Used to test uart_tx module
+# better compared to serial terminal
 import serial
-
 # Configure the serial port
 ser = serial.Serial(
 
