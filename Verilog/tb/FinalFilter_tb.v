@@ -3,13 +3,13 @@
 module testBench();
 
 	parameter  IMG_W = 512;
-	parameter  IMG_H = 366;
-	parameter WIND = 5;
+	parameter  IMG_H = 340;
+	parameter WIND = 3;
 	parameter D_W = 24;
 	parameter B_W = 32;
-	parameter DEPTH = (IMG_W+WIND-1)*(IMG_H+WIND-1);
-	parameter INPUT_FILENAME = "./Hexadecimal-Images/dogs3zeroPadded.txt";
-	parameter OUTPUT_FILENAME = "./Hexadecimal-Images/dogs3Filtout.txt";
+	parameter DEPTH = (IMG_W+WIND-1)*(IMG_H+WIND-1) + (IMG_W*IMG_H);
+	parameter INPUT_FILENAME = "./Hexadecimal-Images/cat1zeroPadded.txt";
+	parameter OUTPUT_FILENAME = "./Hexadecimal-Images/cat1Filtout.txt";
 	//Signal line
 	reg clk,strt, rst;
 	wire filt_dne, system_dne, filt_en, mem_rdy;
@@ -20,7 +20,7 @@ module testBench();
 	wire [D_W-1:0] mem_odata;
 	wire [D_W-1:0] filt_idata;
 	Memory #(.DEPTH(DEPTH),.DATA_WIDTH(D_W),.ADDR_WIDTH(B_W),.FILENAME(INPUT_FILENAME)) memory(
-	clk,rst,mem_rw,mem_addr,mem_idata,mem_odata,mem_rdy);
+	clk,rst,mem_rw,mem_addr,filt_idata,mem_odata,mem_rdy);
 
 //module Filter(Filt_CLK, Filt_RST, Filt_EN,Filt_MEMRDY,Filt_MEMDATA,Filt_RES,Filt_DNE);
 

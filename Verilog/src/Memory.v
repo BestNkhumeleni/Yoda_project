@@ -51,11 +51,15 @@ reg [DATA_WIDTH-1:0] MEMORY [0:DEPTH-1]; //MEMORY  BLOCK
 
 integer iter;
 
+
+initial begin
+	$readmemh(FILENAME,MEMORY);
+end
+
 always@(posedge Mem_CLK or posedge Mem_RST) begin
 	
 	//Reset
 	if(Mem_RST) begin
-		$readmemh(FILENAME,MEMORY); //reads Data from Memory.
 		Mem_ODR <= 0;
 		Mem_DRDY <= 0;
 	end else if(Mem_RW == 2'b01) begin

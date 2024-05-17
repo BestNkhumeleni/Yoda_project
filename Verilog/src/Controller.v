@@ -123,10 +123,9 @@ always@(negedge Control_CLK) begin
 			Control_SR = 1; //change control status to 1 (FILTER_START)
 
 		end else if(pixelCounter == IMAGE_WIDTH*IMAGE_HEIGHT-1) begin
-				$display("Exited with %d pixels written",pixelCounter);
 				Control_SR =0;
 				Control_DNE = 1;
-				Control_MEMRW =0;
+				Control_MEMRW = RESULT_START_ADDRESS;
 				$fclose(fptr);
 		end
 	end
@@ -135,7 +134,8 @@ end
 //processing subsequent window pixel
 
 always@(posedge Control_FDNE) begin // when getting DNE signal
-	Control_MEMRW <= 00; // change write signal to write
+	Control_MEMRW <= 01; // change write signal to write
+	Control_MEMADDR <= RESULT_START_ADDRESS + pixelCounter;
 	Control_FEN <=0; // Disabe filter
 	Control_SR <=3; // change control mode to ADJUST PIXEL.
 	$fwriteh(fptr,Control_FDATA);
