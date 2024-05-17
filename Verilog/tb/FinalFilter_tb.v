@@ -3,13 +3,13 @@
 module testBench();
 
 	parameter  IMG_W = 512;
-	parameter  IMG_H = 340;
-	parameter WIND = 3;
+	parameter  IMG_H = 341;
+	parameter WIND = 5;
 	parameter D_W = 24;
 	parameter B_W = 32;
 	parameter DEPTH = (IMG_W+WIND-1)*(IMG_H+WIND-1) + (IMG_W*IMG_H);
-	parameter INPUT_FILENAME = "./Hexadecimal-Images/cat1zeroPadded.txt";
-	parameter OUTPUT_FILENAME = "./Hexadecimal-Images/cat1Filtout.txt";
+	parameter INPUT_FILENAME = "./Hexadecimal-Images/cat2zeroPadded.txt";
+	parameter OUTPUT_FILENAME = "./Hexadecimal-Images/cat2Filtout.txt";
 	//Signal line
 	reg clk,strt, rst;
 	wire filt_dne, system_dne, filt_en, mem_rdy;
