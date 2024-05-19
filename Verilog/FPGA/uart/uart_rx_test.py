@@ -6,7 +6,7 @@ ser = serial.Serial('COM4', 9600)
 data_to_send = 0
 try:
     # Loop to continuously send data
-    while data_to_send < 128:
+    while data_to_send < 256:
         # Define the 8-bit number to be transmitted (0x0F = 15 in decimal)
     
 
@@ -18,7 +18,7 @@ try:
         print("Data sent:", data_to_send)
 
         # Wait for a short time before sending the next data
-        time.sleep(0.5)
+        time.sleep(0.275)
         data_to_send = data_to_send + 1
         
 

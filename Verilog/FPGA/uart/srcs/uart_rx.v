@@ -5,27 +5,25 @@
 module uart_rx #(parameter CLKS_PER_BIT = 10416)(
     input  clk, // clock
     input  i_rx, // input bit
-    output o_rx_data_valid, // goes high when all data is recieved
-    output[7:0] o_rx_byte   // data read
+    output reg o_rx_data_valid, // goes high when all data is recieved
+    output reg[7:0]  o_rx_byte   // data read
 );
     // states
     // UART has start bit, data then stop bit
-    localparam IDLE    =  3'b000;
-    localparam START   =  3'b001;
-    localparam DATA    =  3'b010;
-    localparam STOP    =  3'b011;
-    localparam CLEANUP =  3'b100;
-
-    reg[2:0] rx_state  = IDLE;
+    localparam IDLE    =  2'b00;
+    localparam START   =  2'b01;
+    localparam DATA    =  2'b10;
+    localparam STOP    =  2'b11;
+    reg[1:0] rx_state  = IDLE;
     reg[15:0] counter  = 0;
     reg[7:0] rx_byte   = 0;
     reg[2:0] bit_index = 0;
-    reg rx_data_valid  = 0;
+  
 
     always @(posedge clk)  begin
         case (rx_state)
             IDLE : begin
-                rx_data_valid <= 1'b0;
+                o_rx_data_valid <= 1'b0;
                 counter       <= 0;
                 bit_index     <= 0;
 
@@ -64,6 +62,8 @@ module uart_rx #(parameter CLKS_PER_BIT = 10416)(
                     else begin
                         bit_index <= 0;
                         rx_state  <= STOP;
+                        o_rx_byte <= rx_byte;
+                        o_rx_data_valid <= 1'b1;
                     end
                 end
             end
@@ -74,20 +74,11 @@ module uart_rx #(parameter CLKS_PER_BIT = 10416)(
                     rx_state <= STOP;
                 end
                 else begin
-                    rx_data_valid <= 1'b1;
                     counter  <= 0;
-                    rx_state <= CLEANUP;
+                    rx_state <= IDLE;
                 end
-            end
-            CLEANUP : begin
-                rx_state      <= IDLE;
-                rx_data_valid <= 1'b0;
             end
             default : rx_state <= IDLE;
         endcase
     end
-
-    assign  o_rx_data_valid = rx_data_valid;
-    assign o_rx_byte        = rx_byte;
-
 endmodule
