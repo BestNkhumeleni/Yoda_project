@@ -73,10 +73,38 @@ module controlTB;
         Control_FDNE = 0;
 
         // Wait for process to complete
-        #(1000 * CLOCK_PERIOD); // Adjust as necessary based on expected processing time
+        #(10 * CLOCK_PERIOD); // Adjust as necessary based on expected processing time
+      
+      	 // Reset the module
+        #(CLOCK_PERIOD);
+        Control_RST = 1;
+        #(CLOCK_PERIOD);
+        Control_RST = 0;
 
+        // Start the filtering process
+        #(CLOCK_PERIOD);
+        Control_STRT = 1;
+        #(CLOCK_PERIOD);
+        Control_STRT = 0;
+
+        // Wait for some clock cycles
+        #(10 * CLOCK_PERIOD);
+
+        // Simulate Filter Done signal
+        Control_FDNE = 1;
+        #(CLOCK_PERIOD);
+        Control_FDNE = 0;
+      
+       	// Dump waveforms to VCD file
+        $dumpfile("dump.vcd");
+        $dumpvars(0, controlTB);
+      
+   	    // Wait for process to complete
+        #(100 * CLOCK_PERIOD); // Adjust as necessary based on expected processing time
+      
+      	
         // Finish the simulation
-        $stop;
+        $finish;
     end
 
 endmodule
